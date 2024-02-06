@@ -2,6 +2,12 @@
 
 A Flutter widget for implementing predictive search functionality with customizable predictions list.
 
+## Features
+
+- Predictive search suggestions based on user input.
+- Customizable appearance for search predictions. 
+- Easy integration into Flutter applications.
+
 ## Installation
 
 Add the `predictive_search` package to your `pubspec.yaml` file:
