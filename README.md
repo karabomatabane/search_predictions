@@ -1,6 +1,3 @@
-Certainly! Here's a revised README draft with updated information:
-
-```markdown
 # Predictive Search Widget
 
 A Flutter widget for implementing predictive search functionality with customizable predictions list.
@@ -75,7 +72,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 - Karabo Matabane
     - Email: karaboramakau@gmail.com
-```
-
-Replace `yourListOfSearchObjects` and update any other placeholders with actual values based on your project. If there's any additional information or sections you'd like to include, feel free to modify the README accordingly.
 
