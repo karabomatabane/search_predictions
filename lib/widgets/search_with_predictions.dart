@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:search_predictions/widgets/predictions_list_tile.dart';
 
 import '../models/prediction.model.dart';
+import '../models/search_object.model.dart';
 import '../models/special.model.dart';
+import '../utils/utilities.dart';
 
 class PredictiveSearch extends StatefulWidget {
-  final List<Special> specials;
-  const PredictiveSearch({super.key, required this.specials});
+  /// List of search objects used for predictions.
+  final List<SearchObject> objs;
+  /// Callback function to execute when a prediction is tapped.
+  final VoidCallback onTap;
+  /// Placeholder text for the search field.
+  String? placeholder;
+  PredictiveSearch({super.key, required this.objs, required this.onTap,
+    this.placeholder});
 
   @override
   State<PredictiveSearch> createState() => _PredictiveSearchState();
@@ -17,6 +25,8 @@ class PredictiveSearch extends StatefulWidget {
 
 class _PredictiveSearchState extends State<PredictiveSearch> {
   List<Prediction> predictions = <Prediction>[];
+  String placeholder = 'Search something...';
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -28,7 +38,7 @@ class _PredictiveSearchState extends State<PredictiveSearch> {
         children: <Widget>[
           TextField(
               decoration: InputDecoration(
-                hintText: 'Search something...',
+                hintText: widget.placeholder ?? placeholder,
                 hintStyle: const TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
@@ -48,7 +58,7 @@ class _PredictiveSearchState extends State<PredictiveSearch> {
               ),
             onChanged: (String value) {
               setState(() {
-                predictions = getPredictions(value);
+                predictions = Utilities.getPredictions(value, widget.objs);
                 if (value.isEmpty) {
                   predictions = <Prediction>[];
                 }
@@ -64,7 +74,7 @@ class _PredictiveSearchState extends State<PredictiveSearch> {
                   itemBuilder: (BuildContext context, int index) {
                     return PredictionsListTile(
                         prediction: predictions[index].matchingString,
-                        onTap: () {});
+                        onTap: widget.onTap);
                   },
                 ),
               ),
@@ -72,66 +82,5 @@ class _PredictiveSearchState extends State<PredictiveSearch> {
         ],
       ),
     );
-  }
-
-  List<Prediction> getPredictions(String value) {
-    String query = value.toLowerCase();
-    final List<Prediction> predictions = <Prediction>[];
-    //search all properties of the specials and assign the matching properties' strings to the predictions list
-    // if there's a name that matches, add it to the predictions list
-    // if there's a description that matches, add "name: up to five words surrounding the match" to the predictions list
-    // if both name and description match, add the name to the predictions list
-    // if there's no match, return an empty list
-    for (Special special in widget.specials) {
-      if (special.name.toLowerCase().contains(query)) {
-        predictions.add(Prediction(specialId: special.id, matchingString:decorateName(special.name, query)));
-      } else if (special.description.toLowerCase().contains(query)) {
-        String matchingString = "${special.name}: ${decorateString(special.description, query)}";
-        predictions.add(Prediction(specialId: special.id, matchingString: matchingString));
-      }
-    }
-    return predictions;
-  }
-
-  String decorateString(String match, String query) {
-    final int index = match.toLowerCase().indexOf(query);
-    final int length = query.length;
-    match = match.replaceFirst(RegExp(query, caseSensitive: false), "*$query*").toLowerCase();
-    if (kDebugMode) {
-      print("MATCH: $match");
-    }
-    final List<String> words = match.split(" ");
-    final int matchIndex = words.indexWhere((String word) => word.toLowerCase().contains(query));
-    final String firstPart = '... ${words.sublist(max(matchIndex - 5, 0), matchIndex).join(" ")}';
-    final String queryPart = words[matchIndex];
-    final String secondPart = '${words.sublist(matchIndex + 1, min(words.length, matchIndex + 3)).join(" ")} ...';
-    return "$firstPart $queryPart $secondPart";
-  }
-
-  String decorateName(String match, String query) {
-    final int index = match.toLowerCase().indexOf(query);
-    final int length = query.length;
-    match = toTitleCase(match.replaceFirst(RegExp(query, caseSensitive: false), "*$query*"));
-    if (kDebugMode) {
-      print("MATCH: $match");
-    }
-    final List<String> words = match.split(" ");
-    final int matchIndex = words.indexWhere((String word) => word.toLowerCase().contains(query));
-    final String firstPart = words.sublist(max(matchIndex - 5, 0), matchIndex).join(" ");
-    final String queryPart = words[matchIndex];
-    final String secondPart = words.sublist(matchIndex + 1, min(words.length, matchIndex + 3)).join(" ");
-    return "$firstPart $queryPart $secondPart";
-  }
-
-  String toTitleCase(String text) {
-    String output = '';
-    text.split(' ').map((String word) {
-      if(word[0] == '*' && word.substring(1).isNotEmpty) {
-        output += '*${word[1].toUpperCase()}${word.substring(2)} ';
-        return;
-      }
-      output += '${word[0].toUpperCase()}${word.substring(1)} ';
-    }).toList();
-    return output.trim();
   }
 }

@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 
 class PredictionsListTile extends StatelessWidget {
+  /// The prediction string to be displayed.
   final String prediction;
+  /// Callback function to be executed when the tile is tapped.
   final VoidCallback onTap;
   const PredictionsListTile({super.key, required this.prediction, required this.onTap});
 

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:search_predictions/widgets/search_with_predictions.dart';
 
+import 'models/search_object.model.dart';
 import 'models/special.model.dart';
 
 void main() {
@@ -52,14 +53,22 @@ class _HomeState extends State<Home> {
       description: "Special 5 description",
     ),
   ];
+  List<SearchObject> searchObjects = <SearchObject>[];
+  @override
+  void initState() {
+    searchObjects = specials.map((e) => SearchObject(id: e.id, name: e.name, prop1: e.description)).toList();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: PredictiveSearch(specials: specials),
+            ConstrainedBox(
+              // set max height to 40vh
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.45),
+              child: PredictiveSearch(objs: searchObjects, onTap: () {}, placeholder: 'Search specials...'),
             ),
             const Center(
               child: Text(
